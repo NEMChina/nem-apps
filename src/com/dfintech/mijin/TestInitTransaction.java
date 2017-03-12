@@ -51,11 +51,6 @@ public class TestInitTransaction {
 	private static JSONObject convertString2JSON(String input){
 		JSONObject params = null;
 		try {
-			input = input.replaceAll(":", ":\"")
-					.replaceAll(",", "\",")
-					.replaceAll("}", "\"}")
-					.replaceAll("\"\\{", "\\{")
-					.replaceAll("}\"", "}");
 			params = JSONObject.fromObject(input);
 		} catch (Exception ex) {
 			OutputMessage.error("invalid parameter");
