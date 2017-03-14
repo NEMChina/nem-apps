@@ -1,4 +1,4 @@
-package com.dfintech.mijin;
+package com.dfintech.nem.apps;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,12 +17,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import com.dfintech.mijin.model.OutgoingTransaction;
-import com.dfintech.mijin.model.UnconfirmedTransaction;
-import com.dfintech.mijin.utils.Constants;
-import com.dfintech.mijin.utils.HexStringUtils;
-import com.dfintech.mijin.utils.HttpClientUtils;
-import com.dfintech.mijin.utils.OutputMessage;
+import com.dfintech.nem.apps.model.OutgoingTransaction;
+import com.dfintech.nem.apps.model.UnconfirmedTransaction;
+import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HexStringUtils;
+import com.dfintech.nem.apps.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.OutputMessage;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.dfintech.mijin.utils;
+package com.dfintech.nem.apps.utils;
 
 /** 
  * @Description: String Utils

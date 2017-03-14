@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>mijin-apps</groupId>
-	<artifactId>mijin-apps</artifactId>
+	<groupId>nem-apps</groupId>
+	<artifactId>nem-apps</artifactId>
 	<version>0.0.1</version>
 	<dependencies>
 		<dependency>
@@ -67,7 +67,7 @@
 			                <appendAssemblyId>false</appendAssemblyId>
 			                <archive>
 			                    <manifest>
-			                        <mainClass>com.dfintech.mijin.ImplInitTransaction</mainClass>
+			                        <mainClass>com.dfintech.nem.apps.ImplInitTransaction</mainClass>
 			                    </manifest>
 			                </archive>
 			                <descriptorRefs>
@@ -87,7 +87,7 @@
 			                <appendAssemblyId>false</appendAssemblyId>
 			                <archive>
 			                    <manifest>
-			                        <mainClass>com.dfintech.mijin.ImplInitMultisigTransaction</mainClass>
+			                        <mainClass>com.dfintech.nem.apps.ImplInitMultisigTransaction</mainClass>
 			                    </manifest>
 			                </archive>
 			                <descriptorRefs>
@@ -107,7 +107,7 @@
 			                <appendAssemblyId>false</appendAssemblyId>
 			                <archive>
 			                    <manifest>
-			                        <mainClass>com.dfintech.mijin.ImplCosignMultisigTransaction</mainClass>
+			                        <mainClass>com.dfintech.nem.apps.ImplCosignMultisigTransaction</mainClass>
 			                    </manifest>
 			                </archive>
 			                <descriptorRefs>
@@ -127,7 +127,7 @@
 			                <appendAssemblyId>false</appendAssemblyId>
 			                <archive>
 			                    <manifest>
-			                        <mainClass>com.dfintech.mijin.ImplMonitorIncomingTransaction</mainClass>
+			                        <mainClass>com.dfintech.nem.apps.ImplMonitorIncomingTransaction</mainClass>
 			                    </manifest>
 			                </archive>
 			                <descriptorRefs>
@@ -147,7 +147,7 @@
 			                <appendAssemblyId>false</appendAssemblyId>
 			                <archive>
 			                    <manifest>
-			                        <mainClass>com.dfintech.mijin.ImplMonitorMultisigTransaction</mainClass>
+			                        <mainClass>com.dfintech.nem.apps.ImplMonitorMultisigTransaction</mainClass>
 			                    </manifest>
 			                </archive>
 			                <descriptorRefs>

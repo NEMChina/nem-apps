@@ -1,9 +1,9 @@
-package com.dfintech.mijin.model;
+package com.dfintech.nem.apps.model;
 
 import java.util.Date;
 
-import com.dfintech.mijin.utils.Constants;
-import com.dfintech.mijin.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HttpClientUtils;
 
 import net.sf.json.JSONObject;
 

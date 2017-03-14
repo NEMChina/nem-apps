@@ -1,7 +1,7 @@
-package com.dfintech.mijin.model;
+package com.dfintech.nem.apps.model;
 
-import com.dfintech.mijin.utils.Constants;
-import com.dfintech.mijin.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HttpClientUtils;
 
 /** 
  * @Description: Query unconfirmed transactions

@@ -1,4 +1,4 @@
-package com.dfintech.mijin;
+package com.dfintech.nem.apps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +10,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang.StringUtils;
 
-import com.dfintech.mijin.model.InitTransaction;
-import com.dfintech.mijin.utils.Constants;
-import com.dfintech.mijin.utils.HttpClientUtils;
-import com.dfintech.mijin.utils.OutputMessage;
+import com.dfintech.nem.apps.model.InitTransaction;
+import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.OutputMessage;
 
 import net.sf.json.JSONObject;
 

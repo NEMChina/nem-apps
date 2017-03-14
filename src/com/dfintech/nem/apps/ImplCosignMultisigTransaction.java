@@ -1,4 +1,4 @@
-package com.dfintech.mijin;
+package com.dfintech.nem.apps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,21 +8,20 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.lang.StringUtils;
 
-import com.dfintech.mijin.model.InitMultisigTransaction;
-import com.dfintech.mijin.utils.Constants;
-import com.dfintech.mijin.utils.HttpClientUtils;
-import com.dfintech.mijin.utils.OutputMessage;
+import com.dfintech.nem.apps.model.CosignMultisigTransaction;
+import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.OutputMessage;
 
 import net.sf.json.JSONObject;
 
 /** 
- * @Description: Main class - test init multisig transaction
+ * @Description: Main class - test cosign multisig transaction
  * @author lu
  * @date 2017.03.07
  */ 
-public class ImplInitMultisigTransaction {
+public class ImplCosignMultisigTransaction {
 
 	public static void main(String[] args) {
 		if(args.length==0){
@@ -43,18 +42,15 @@ public class ImplInitMultisigTransaction {
 		// get publicKey from NIS
 		queryPublicKeyFromNIS(params);
 		// send transaction
-		String multisigPublicKey = params.get("multisigPublicKey");
+		String innerTransactionHash = params.get("innerTransactionHash");
 		String cosignatoryPublicKey = params.get("cosignatoryPublicKey");
 		String cosignatoryPrivateKey = params.get("cosignatoryPrivateKey");
-		long amount = Long.valueOf(params.get("amount")).longValue();
-		String recipient = params.get("recipient");
-		String message = params.containsKey("message")?params.get("message"):"";
-		InitMultisigTransaction tx = new InitMultisigTransaction(cosignatoryPublicKey, cosignatoryPrivateKey, multisigPublicKey);
-		JSONObject result = JSONObject.fromObject(tx.send(recipient, amount, message));
+		String multisigAddress = params.get("multisigAddress");
+		CosignMultisigTransaction tx = new CosignMultisigTransaction(cosignatoryPublicKey, cosignatoryPrivateKey, multisigAddress, innerTransactionHash);
+		JSONObject result = JSONObject.fromObject(tx.send());
 		if(result.containsKey("message") && "SUCCESS".equals(result.getString("message"))){
 			String transactionHash = result.getJSONObject("transactionHash").getString("data");
-			String innerTransactionHash = result.getJSONObject("innerTransactionHash").getString("data");
-			OutputMessage.initMultisigTransactionMessage("success", transactionHash, innerTransactionHash);
+			OutputMessage.initCosignTransactionMessage("success", transactionHash);
 		} else {
 			OutputMessage.error(result.getString("message"));
 		}
@@ -72,9 +68,7 @@ public class ImplInitMultisigTransaction {
 		options.addOption(Option.builder("multisigAddress").hasArg().build());
 		options.addOption(Option.builder("cosignatoryAddress").hasArg().build());
 		options.addOption(Option.builder("cosignatoryPrivateKey").hasArg().build());
-		options.addOption(Option.builder("recipient").hasArg().build());
-		options.addOption(Option.builder("amount").hasArg().build());
-		options.addOption(Option.builder("message").hasArg().build());
+		options.addOption(Option.builder("innerTransactionHash").hasArg().build());
 		options.addOption(Option.builder("host").hasArg().build());
 		options.addOption(Option.builder("port").hasArg().build());
 		CommandLine commandLine = null;
@@ -87,9 +81,7 @@ public class ImplInitMultisigTransaction {
 		String multisigAddress = commandLine.getOptionValue("multisigAddress")==null?"":commandLine.getOptionValue("multisigAddress").replaceAll("-", "");
 		String cosignatoryAddress = commandLine.getOptionValue("cosignatoryAddress")==null?"":commandLine.getOptionValue("cosignatoryAddress").replaceAll("-", "");
 		String cosignatoryPrivateKey = commandLine.getOptionValue("cosignatoryPrivateKey")==null?"":commandLine.getOptionValue("cosignatoryPrivateKey");
-		String recipient = commandLine.getOptionValue("recipient")==null?"":commandLine.getOptionValue("recipient").replaceAll("-", "");
-		String amount = commandLine.getOptionValue("amount")==null?"":commandLine.getOptionValue("amount");
-		String message = commandLine.getOptionValue("message")==null?"":commandLine.getOptionValue("message");
+		String innerTransactionHash = commandLine.getOptionValue("innerTransactionHash")==null?"":commandLine.getOptionValue("innerTransactionHash");
 		String host = commandLine.getOptionValue("host");
 		String port = commandLine.getOptionValue("port");
 		// check multisigAddress
@@ -100,21 +92,6 @@ public class ImplInitMultisigTransaction {
 		// check cosignatoryAddress
 		if(cosignatoryAddress.length()!=40){
 			OutputMessage.error("invalid parameter [cosignatoryAddress]");
-			return null;
-		}
-		// check recipient
-		if(recipient.length()!=40){
-			OutputMessage.error("invalid parameter [recipient]");
-			return null;
-		}
-		// check amount
-		if(!StringUtils.isNumeric(amount) || Long.valueOf(amount).longValue()<0){
-			OutputMessage.error("invalid parameter [amount]");
-			return null;
-		}
-		// check message
-		if(message.getBytes().length>320){
-			OutputMessage.error("invalid parameter [message]");
 			return null;
 		}
 		// check host
@@ -130,9 +107,7 @@ public class ImplInitMultisigTransaction {
 		params.put("multisigAddress", multisigAddress);
 		params.put("cosignatoryAddress", cosignatoryAddress);
 		params.put("cosignatoryPrivateKey", cosignatoryPrivateKey);
-		params.put("recipient", recipient);
-		params.put("amount", amount);
-		params.put("message", message);
+		params.put("innerTransactionHash", innerTransactionHash);
 		params.put("host", host);
 		params.put("port", port);
 		return params;
@@ -143,13 +118,9 @@ public class ImplInitMultisigTransaction {
 	 * @param params
 	 */
 	private static void queryPublicKeyFromNIS(Map<String, String> params){
-		// query multisig account publicKey
-		String queryResult = HttpClientUtils.get(Constants.URL_ACCOUNT_GET + "?address=" + params.get("multisigAddress"));
-		JSONObject queryAccount = JSONObject.fromObject(queryResult);
-		params.put("multisigPublicKey", queryAccount.getJSONObject("account").getString("publicKey"));
 		// query cosignatory account publicKey
-		queryResult = HttpClientUtils.get(Constants.URL_ACCOUNT_GET + "?address=" + params.get("cosignatoryAddress"));
-		queryAccount = JSONObject.fromObject(queryResult);
+		String queryResult = HttpClientUtils.get(Constants.URL_ACCOUNT_GET + "?address=" + params.get("cosignatoryAddress"));
+		JSONObject queryAccount = JSONObject.fromObject(queryResult);
 		params.put("cosignatoryPublicKey", queryAccount.getJSONObject("account").getString("publicKey"));
 	}
 

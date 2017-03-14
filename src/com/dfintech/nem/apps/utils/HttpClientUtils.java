@@ -1,4 +1,4 @@
-package com.dfintech.mijin.utils;
+package com.dfintech.nem.apps.utils;
 
 import java.io.IOException;
 import java.net.URLDecoder;

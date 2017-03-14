@@ -1,4 +1,4 @@
-## NEM/Mijin apps ##
+## NEM apps ##
 
 1) initiate transfer transaction
 
