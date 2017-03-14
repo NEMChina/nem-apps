@@ -3,9 +3,9 @@ package com.dfintech.mijin.model;
 import java.util.Date;
 
 import com.dfintech.mijin.utils.Constants;
+import com.dfintech.mijin.utils.FeeCalculateUtils;
 import com.dfintech.mijin.utils.HexStringUtils;
 import com.dfintech.mijin.utils.HttpClientUtils;
-import com.dfintech.mijin.utils.MessageFeeUtils;
 
 import net.sf.json.JSONObject;
 
@@ -26,7 +26,7 @@ public class InitMultisigTransaction {
 		this.multisigPublicKey = multisigPublicKey;
 	}
 	
-	public String send(String recipient, int amount, String messagePayload){
+	public String send(String recipient, long amount, String messagePayload){
 		JSONObject params = new JSONObject();
 		// message object
 		JSONObject message = new JSONObject();
@@ -35,9 +35,10 @@ public class InitMultisigTransaction {
 		// otherTrans object
 		JSONObject otherTrans = new JSONObject();
 		long nowTime = new Date().getTime();
+		long fee = FeeCalculateUtils.calculateMinFeeNoMosaic(amount, messagePayload);
 		otherTrans.put("timeStamp", Double.valueOf(nowTime/1000).intValue() - Constants.NEMSISTIME);
-		otherTrans.put("amount", Math.round(amount * Math.pow(10, 6)));
-		otherTrans.put("fee", MessageFeeUtils.calculateFee(messagePayload));
+		otherTrans.put("amount", amount * Constants.MICRONEMS_IN_NEM);
+		otherTrans.put("fee", fee * Constants.MICRONEMS_IN_NEM);
 		otherTrans.put("recipient", recipient);
 		otherTrans.put("type", 257);
 		otherTrans.put("deadline", Double.valueOf(nowTime/1000).intValue() - Constants.NEMSISTIME + 60*60 - 1);

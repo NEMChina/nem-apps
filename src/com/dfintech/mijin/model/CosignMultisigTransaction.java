@@ -44,6 +44,7 @@ public class CosignMultisigTransaction {
 		transaction.put("otherAccount", this.multisigAddress);
 		params.put("transaction", transaction);
 		params.put("privateKey", this.privateKey);
+		System.out.println(params.toString());
 		return HttpClientUtils.post(Constants.URL_INIT_TRANSACTION, params.toString());
 	}
 }

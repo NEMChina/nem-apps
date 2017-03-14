@@ -1,0 +1,115 @@
+1. initTransaction
+--------------------------------------------------------------
+In parameters:
+Name						Description
+address						the address of the initiate
+privateKey					the private key of the initiate
+recipient					the address of the recipient
+amount						the amount of NEM (xem)
+message						the message included into the transaction
+host						specify the server's host
+port						specify the server's port
+Example:
+java -jar initTransaction.jar -address xxx -privateKey xxx -recipient xxx -amount 15 -message "I am tester002" -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+flag						success or error
+transactionHash				the hash of transaction
+Example:
+{"flag":"success","transactionHash":"xxx"}
+
+
+
+2. initMultisigTransaction
+--------------------------------------------------------------
+In parameters:
+Name						Description
+multisigAddress				the address of multisig account
+cosignatoryAddress			the address of cosignatory account
+cosignatoryPrivateKey		the private key of cosignatory account
+recipient					the address of the recipient
+amount						the amount of NEM (xem)
+message						the message included into the transaction
+host						specify the server's host
+port						specify the server's port
+Example:
+java -jar initMultisigTransaction.jar -multisigAddress xxx -cosignatoryAddress xxx -cosignatoryPrivateKey xxx -recipient xxx -amount 100 -message "I am test003" -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+flag						success or error
+transactionHash				the hash of transaction
+innerTransactionHash		the hash of inner transaction
+Example:
+{"flag":"success","transactionHash":"xxx","innerTransactionHash":"xxx"}
+
+
+
+3. cosignMultisigTransaction
+--------------------------------------------------------------
+In parameters:
+Name						Description
+multisigAddress				the address of multisig account
+cosignatoryAddress			the address of cosignatory account
+cosignatoryPrivateKey		the private key of cosignatory account
+innerTransactionHash		the hash of multisig transaction
+host						specify the server's host
+port						specify the server's port
+Example:
+java -jar cosignMultisigTransaction.jar -multisigAddress xxx -cosignatoryAddress xxx -cosignatoryPrivateKey xxx -innerTransactionHash xxx -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+flag						success or error
+transactionHash				the hash of transaction
+Example:
+{"flag":"success","transactionHash":"xxx"}
+
+
+
+4. monitorIncomingTransaction
+--------------------------------------------------------------
+In parameters:
+Name						Description
+address						the address of account
+host						specify the server's host
+port						specify the server's port
+Example:
+java -jar monitorIncomingTransaction.jar -address xxx -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+sender						the address of sender
+date						the date when the transaction was created
+amount						the amount of NEM (xem)
+message						the message included into the transaction
+isMultisig					0: is not multisig transaction, 0: is multisig transaction
+Example:
+{"sender":"xxx","amount":111,"date":"2017-03-14 16:57:00","message":"I am test003","isMultisig":"1"}
+
+
+
+5. monitorIncomingTransaction
+--------------------------------------------------------------
+In parameters:
+Name						Description
+address						the address of account
+host						specify the server's host
+port						specify the server's port
+Example:
+java -jar monitorMultisigTransaction.jar -address xxx -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+status						the status of the multisig transaction
+innerTransactionHash		the hash of the multisig transaction
+cosignAccount				the signed accounts
+	address					the address
+	date					the date
+unsignedAccount				the unsigned accounts
+	address					the address
+minCosignatories			the amount of min cosignatories
+recipent						the address of recipent
+amount						the amount of NEM (xem)
+message						the message included into the transaction
+Example:
+{"status":"pending","innerTransactionHash":"xxx","cosignAccount":[{"address":"xxx","date":"2017-03-14 16:57:00"},{"address":"xxx","date":"2017-03-14 17:09:11"}],"unsignedAccount":[{"address":"xxx"},{"address":"xxxx"},{"address":"xxx"}],"minCosignatories":3,"recipient":"xxx","amount":111,"message":"I am test003"}
+
+
+

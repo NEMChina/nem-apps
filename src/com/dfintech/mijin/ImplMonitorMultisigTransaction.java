@@ -11,6 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+
 import com.dfintech.mijin.model.OutgoingTransaction;
 import com.dfintech.mijin.model.UnconfirmedTransaction;
 import com.dfintech.mijin.utils.Constants;
@@ -26,7 +32,7 @@ import net.sf.json.JSONObject;
  * @author lu
  * @date 2017.03.07
  */ 
-public class TestMonitorMultisigTransaction {
+public class ImplMonitorMultisigTransaction {
 
 	private static long lastID = 0;
 	
@@ -39,11 +45,18 @@ public class TestMonitorMultisigTransaction {
 			OutputMessage.error("please enter json parameter");
 			return;
 		}
-		JSONObject params = convertString2JSON(args[0]);
+		Map<String, String> params = parseParamsToMap(args);
 		if(params==null){
 			return;
 		}
-		address = params.getString("address");
+		String host = params.get("host");
+		String port = params.get("port");
+		// set host and port
+		if(host!=null)
+			HttpClientUtils.defaultHost = host;
+		if(port!=null)
+			HttpClientUtils.defaultPort = port;
+		address = params.get("address");
 		ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
 		pool.scheduleWithFixedDelay(new Runnable(){
 			public void run() {
@@ -54,24 +67,45 @@ public class TestMonitorMultisigTransaction {
 	}
 	
 	/**
-	 * convert string to JSON object
-	 * @param input
+	 * parse parameters
+	 * @param args
 	 * @return
 	 */
-	private static JSONObject convertString2JSON(String input){
-		JSONObject params = null;
-		try {
-			params = JSONObject.fromObject(input);
-		} catch (Exception ex) {
+	private static Map<String, String> parseParamsToMap(String[] args){
+		Map<String, String> params = new HashMap<String, String>();
+		CommandLineParser parser = new DefaultParser();
+		Options options = new Options();
+		options.addOption(Option.builder("address").hasArg().build());
+		options.addOption(Option.builder("host").hasArg().build());
+		options.addOption(Option.builder("port").hasArg().build());
+		CommandLine commandLine = null;
+		try{
+			commandLine = parser.parse(options, args);
+		} catch(Exception ex) {
 			OutputMessage.error("invalid parameter");
 			return null;
 		}
-		// check multisigAccount 
-		if(!params.containsKey("address")){
+		String address = commandLine.getOptionValue("address")==null?"":commandLine.getOptionValue("address").replaceAll("-", "");
+		String host = commandLine.getOptionValue("host");
+		String port = commandLine.getOptionValue("port");
+		// check address
+		if(address.length()!=40){
 			OutputMessage.error("invalid parameter [address]");
 			return null;
 		}
-		params.put("address", params.getString("address").replaceAll("-", ""));
+		// check host
+		if(host!=null && !host.matches("[0-9a-zA-Z]+(\\.[0-9a-zA-Z]+)+")){
+			OutputMessage.error("invalid parameter [host]");
+			return null;
+		}
+		// check port
+		if(port!=null && !port.matches("[0-9]{1,5}")){
+			OutputMessage.error("invalid parameter [port]");
+			return null;
+		}
+		params.put("address", address);
+		params.put("host", host);
+		params.put("port", port);
 		return params;
 	}
 	

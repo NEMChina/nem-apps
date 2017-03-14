@@ -3,9 +3,9 @@ package com.dfintech.mijin.model;
 import java.util.Date;
 
 import com.dfintech.mijin.utils.Constants;
+import com.dfintech.mijin.utils.FeeCalculateUtils;
 import com.dfintech.mijin.utils.HexStringUtils;
 import com.dfintech.mijin.utils.HttpClientUtils;
-import com.dfintech.mijin.utils.MessageFeeUtils;
 
 import net.sf.json.JSONObject;
 
@@ -24,7 +24,7 @@ public class InitTransaction {
 		this.privateKey = privateKey;
 	}
 	
-	public String send(String recipient, int amount, String messagePayload){
+	public String send(String recipient, long amount, String messagePayload){
 		//parameter object
 		JSONObject params = new JSONObject();
 		//inner message object
@@ -34,9 +34,10 @@ public class InitTransaction {
 		//inner transaction object
 		JSONObject transaction = new JSONObject();
 		long nowTime = new Date().getTime();
+		long fee = FeeCalculateUtils.calculateMinFeeNoMosaic(amount, messagePayload);
 		transaction.put("timeStamp", Double.valueOf(nowTime/1000).intValue() - Constants.NEMSISTIME);
-		transaction.put("amount", Math.round(amount * Math.pow(10, 6)));
-		transaction.put("fee", MessageFeeUtils.calculateFee(messagePayload));
+		transaction.put("amount", amount * Constants.MICRONEMS_IN_NEM);
+		transaction.put("fee", fee * Constants.MICRONEMS_IN_NEM);
 		transaction.put("recipient", recipient);
 		transaction.put("type", 257);
 		transaction.put("deadline", Double.valueOf(nowTime/1000).intValue() - Constants.NEMSISTIME + 60*60 - 1);
