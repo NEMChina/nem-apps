@@ -11,6 +11,7 @@ import org.apache.commons.cli.Options;
 
 import com.dfintech.nem.apps.model.CosignMultisigTransaction;
 import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HelperUtils;
 import com.dfintech.nem.apps.utils.HttpClientUtils;
 import com.dfintech.nem.apps.utils.OutputMessage;
 
@@ -25,7 +26,7 @@ public class ImplCosignMultisigTransaction {
 
 	public static void main(String[] args) {
 		if(args.length==0){
-			OutputMessage.error("please enter json parameter");
+			OutputMessage.error("please enter parameter");
 			return;
 		}
 		Map<String, String> params = parseParamsToMap(args);
@@ -71,11 +72,17 @@ public class ImplCosignMultisigTransaction {
 		options.addOption(Option.builder("innerTransactionHash").hasArg().build());
 		options.addOption(Option.builder("host").hasArg().build());
 		options.addOption(Option.builder("port").hasArg().build());
+		options.addOption(Option.builder("h").longOpt("help").build());
 		CommandLine commandLine = null;
 		try{
 			commandLine = parser.parse(options, args);
 		} catch(Exception ex) {
 			OutputMessage.error("invalid parameter");
+			return null;
+		}
+		// print helper
+		if(commandLine.hasOption("h")){
+			System.out.println(HelperUtils.printHelper(Constants.HELPER_FILE_COSIGN_MULTISIG_TRANSACTION));
 			return null;
 		}
 		String multisigAddress = commandLine.getOptionValue("multisigAddress")==null?"":commandLine.getOptionValue("multisigAddress").replaceAll("-", "");

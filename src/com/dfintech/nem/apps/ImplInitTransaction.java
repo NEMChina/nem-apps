@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.dfintech.nem.apps.model.InitTransaction;
 import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HelperUtils;
 import com.dfintech.nem.apps.utils.HttpClientUtils;
 import com.dfintech.nem.apps.utils.OutputMessage;
 
@@ -26,7 +27,7 @@ public class ImplInitTransaction {
 
 	public static void main(String[] args) {
 		if(args.length==0){
-			OutputMessage.error("please enter json parameter");
+			OutputMessage.error("please enter parameter");
 			return;
 		}
 		Map<String, String> params = parseParamsToMap(args);
@@ -74,11 +75,17 @@ public class ImplInitTransaction {
 		options.addOption(Option.builder("message").hasArg().build());
 		options.addOption(Option.builder("host").hasArg().build());
 		options.addOption(Option.builder("port").hasArg().build());
+		options.addOption(Option.builder("h").longOpt("help").build());
 		CommandLine commandLine = null;
 		try{
 			commandLine = parser.parse(options, args);
 		} catch(Exception ex) {
 			OutputMessage.error("invalid parameter");
+			return null;
+		}
+		// print helper
+		if(commandLine.hasOption("h")){
+			System.out.println(HelperUtils.printHelper(Constants.HELPER_FILE_INIT_TRANSACTION));
 			return null;
 		}
 		String address = commandLine.getOptionValue("address")==null?"":commandLine.getOptionValue("address").replaceAll("-", "");

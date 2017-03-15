@@ -17,6 +17,7 @@ import org.apache.commons.cli.Options;
 
 import com.dfintech.nem.apps.model.IncomingTransaction;
 import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.HelperUtils;
 import com.dfintech.nem.apps.utils.HexStringUtils;
 import com.dfintech.nem.apps.utils.HttpClientUtils;
 import com.dfintech.nem.apps.utils.OutputMessage;
@@ -37,7 +38,7 @@ public class ImplMonitorIncomingTransaction {
 	
 	public static void main(String[] args) {
 		if(args.length==0){
-			OutputMessage.error("please enter json parameter");
+			OutputMessage.error("please enter parameter");
 			return;
 		}
 		Map<String, String> params = parseParamsToMap(args);
@@ -72,11 +73,17 @@ public class ImplMonitorIncomingTransaction {
 		options.addOption(Option.builder("address").hasArg().build());
 		options.addOption(Option.builder("host").hasArg().build());
 		options.addOption(Option.builder("port").hasArg().build());
+		options.addOption(Option.builder("h").longOpt("help").build());
 		CommandLine commandLine = null;
 		try{
 			commandLine = parser.parse(options, args);
 		} catch(Exception ex) {
 			OutputMessage.error("invalid parameter");
+			return null;
+		}
+		// print helper
+		if(commandLine.hasOption("h")){
+			System.out.println(HelperUtils.printHelper(Constants.HELPER_FILE_MONITOR_INCOMING_TRANSACTION));
 			return null;
 		}
 		String address = commandLine.getOptionValue("address")==null?"":commandLine.getOptionValue("address").replaceAll("-", "");

@@ -17,4 +17,9 @@ public class Constants {
 	public static final String URL_ACCOUNT_GET_FROMPUBLICKEY = "/account/get/from-public-key";
 	public static final String URL_ACCOUNT_UNCONFIRMEDTRANSACTIONS = "/account/unconfirmedTransactions";
 	public static final String CONTENT_TYPE_TEXT_JSON = "application/json";
+	public static final String HELPER_FILE_INIT_TRANSACTION = "initTransaction_parameter.txt";
+	public static final String HELPER_FILE_INIT_MULTISIG_TRANSACTION = "initMultisigTransaction_parameter.txt";
+	public static final String HELPER_FILE_COSIGN_MULTISIG_TRANSACTION = "cosignMultisigTransaction_parameter.txt";
+	public static final String HELPER_FILE_MONITOR_INCOMING_TRANSACTION = "monitorIncomingTransaction_parameter.txt";
+	public static final String HELPER_FILE_MONITOR_MULTISIG_TRANSACTION = "monitorMultisigTransaction_parameter.txt";
 }

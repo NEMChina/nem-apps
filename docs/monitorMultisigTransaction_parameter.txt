@@ -1,0 +1,23 @@
+In parameters:
+--------------------------------------------------------------
+Name                    Description
+address                 the address of account
+host                    specify the server's host
+port                    specify the server's port
+Example: java -jar monitorMultisigTransaction.jar -address xxx -host 127.0.0.1 -port 7890
+
+Out parameters (JSON):
+--------------------------------------------------------------
+Name                    Description
+status                  the status of the multisig transaction
+innerTransactionHash    the hash of the multisig transaction
+cosignAccount           the signed accounts
+ - address              the address
+ - date                 the date
+unsignedAccount         the unsigned accounts
+ - address              the address
+minCosignatories        the amount of min cosignatories
+recipent                the address of recipent
+amount                  the amount of NEM (xem)
+message                 the message included into the transaction
+Example: {"status":"pending","innerTransactionHash":"xxx","cosignAccount":[{"address":"xxx","date":"2017-03-14 16:57:00"},{"address":"xxx","date":"2017-03-14 17:09:11"}],"unsignedAccount":[{"address":"xxx"},{"address":"xxxx"},{"address":"xxx"}],"minCosignatories":3,"recipient":"xxx","amount":111,"message":"I am test003"}
