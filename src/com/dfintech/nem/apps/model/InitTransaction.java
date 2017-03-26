@@ -2,6 +2,20 @@ package com.dfintech.nem.apps.model;
 
 import java.util.Date;
 
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.PrivateKey;
+import org.nem.core.messages.PlainMessage;
+import org.nem.core.model.Account;
+import org.nem.core.model.Address;
+import org.nem.core.model.TransactionFeeCalculatorAfterFork;
+import org.nem.core.model.TransferTransaction;
+import org.nem.core.model.TransferTransactionAttachment;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.serialization.BinarySerializer;
+import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.TimeInstant;
+
 import com.dfintech.nem.apps.utils.Constants;
 import com.dfintech.nem.apps.utils.FeeCalculateUtils;
 import com.dfintech.nem.apps.utils.HexStringUtils;
@@ -24,7 +38,7 @@ public class InitTransaction {
 		this.privateKey = privateKey;
 	}
 	
-	public String send(String recipient, long amount, String messagePayload){
+	public String send_v1(String recipient, long amount, String messagePayload){
 		//parameter object
 		JSONObject params = new JSONObject();
 		//inner message object
@@ -47,5 +61,26 @@ public class InitTransaction {
 		params.put("transaction", transaction);
 		params.put("privateKey", this.privateKey);
 		return HttpClientUtils.post(Constants.URL_INIT_TRANSACTION, params.toString());
+	}
+	
+	public String send_v2(String recipient, long amount, String messagePayload){
+		// collect parameters
+		TimeInstant timeInstant = new SystemTimeProvider().getCurrentTime();
+		KeyPair senderKeyPair = new KeyPair(PrivateKey.fromHexString(this.privateKey));
+		Account senderAccount = new Account(senderKeyPair);
+		Account recipientAccount = new Account(Address.fromEncoded(recipient));
+		PlainMessage message = new PlainMessage(messagePayload.getBytes());
+		TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		// create transaction
+		TransferTransaction transaction = new TransferTransaction(2, timeInstant, senderAccount, recipientAccount, Amount.fromNem(amount), attachment);
+		TransactionFeeCalculatorAfterFork feeCalculator = new TransactionFeeCalculatorAfterFork();
+		transaction.setFee(feeCalculator.calculateMinimumFee(transaction));
+		transaction.setDeadline(timeInstant.addHours(23));
+		transaction.sign();
+		JSONObject params = new JSONObject();
+		final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
+		params.put("data", ByteUtils.toHexString(data));
+		params.put("signature", transaction.getSignature().toString());
+		return HttpClientUtils.post(Constants.URL_TRANSACTION_ANNOUNCE, params.toString());
 	}
 }

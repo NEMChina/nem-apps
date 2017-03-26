@@ -2,6 +2,19 @@ package com.dfintech.nem.apps.model;
 
 import java.util.Date;
 
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.PrivateKey;
+import org.nem.core.crypto.PublicKey;
+import org.nem.core.model.Account;
+import org.nem.core.model.Address;
+import org.nem.core.model.MultisigSignatureTransaction;
+import org.nem.core.model.TransactionFeeCalculatorAfterFork;
+import org.nem.core.serialization.BinarySerializer;
+import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.TimeInstant;
+
 import com.dfintech.nem.apps.utils.Constants;
 import com.dfintech.nem.apps.utils.HttpClientUtils;
 
@@ -17,16 +30,18 @@ public class CosignMultisigTransaction {
 	private String publicKey = null;
 	private String privateKey = null;
 	private String multisigAddress = null;
+	private String multisigPublicKey = null;
 	private String innerTransactionHash = null;
 	
-	public CosignMultisigTransaction(String publicKey, String privateKey, String multisigAddress, String innerTransactionHash){
+	public CosignMultisigTransaction(String publicKey, String privateKey, String multisigAddress, String multisigPublicKey, String innerTransactionHash){
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
 		this.multisigAddress = multisigAddress;
+		this.multisigPublicKey = multisigPublicKey;
 		this.innerTransactionHash = innerTransactionHash;
 	}
 	
-	public String send(){
+	public String send_v1(){
 		JSONObject params = new JSONObject();
 		// otherHash object
 		JSONObject otherHash = new JSONObject();
@@ -46,5 +61,26 @@ public class CosignMultisigTransaction {
 		params.put("privateKey", this.privateKey);
 		System.out.println(params.toString());
 		return HttpClientUtils.post(Constants.URL_INIT_TRANSACTION, params.toString());
+	}
+	
+	public String send_v2(){
+		// collect parameters
+		TimeInstant timeInstant = new SystemTimeProvider().getCurrentTime();
+		KeyPair senderKeyPair = new KeyPair(PrivateKey.fromHexString(this.privateKey));
+		Account senderAccount = new Account(senderKeyPair);
+		Account multisigAccount = new Account(Address.fromPublicKey(PublicKey.fromHexString(this.multisigPublicKey)));
+		Hash otherTransactionHash = Hash.fromHexString(this.innerTransactionHash);
+		// create multisig signature transaction
+		MultisigSignatureTransaction MultisigSignatureTransaction = new MultisigSignatureTransaction(
+				timeInstant, senderAccount, multisigAccount, otherTransactionHash);
+		TransactionFeeCalculatorAfterFork feeCalculator = new TransactionFeeCalculatorAfterFork();
+		MultisigSignatureTransaction.setFee(feeCalculator.calculateMinimumFee(MultisigSignatureTransaction));
+		MultisigSignatureTransaction.setDeadline(timeInstant.addHours(23));
+		MultisigSignatureTransaction.sign();
+		JSONObject params = new JSONObject();
+		final byte[] data = BinarySerializer.serializeToBytes(MultisigSignatureTransaction.asNonVerifiable());
+		params.put("data", ByteUtils.toHexString(data));
+		params.put("signature", MultisigSignatureTransaction.getSignature().toString());
+		return HttpClientUtils.post(Constants.URL_TRANSACTION_ANNOUNCE, params.toString());
 	}
 }

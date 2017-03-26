@@ -12,8 +12,9 @@ import org.apache.commons.lang.StringUtils;
 
 import com.dfintech.nem.apps.model.InitTransaction;
 import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.DefaultSetting;
 import com.dfintech.nem.apps.utils.HelperUtils;
-import com.dfintech.nem.apps.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.KeyConvertor;
 import com.dfintech.nem.apps.utils.OutputMessage;
 
 import net.sf.json.JSONObject;
@@ -26,6 +27,7 @@ import net.sf.json.JSONObject;
 public class ImplInitTransaction {
 
 	public static void main(String[] args) {
+		DefaultSetting.setDefaultNetwork();
 		if(args.length==0){
 			OutputMessage.error("please enter parameter");
 			return;
@@ -34,15 +36,8 @@ public class ImplInitTransaction {
 		if(params==null){
 			return;
 		}
-		String host = params.get("host");
-		String port = params.get("port");
 		// set host and port
-		if(host!=null)
-			HttpClientUtils.defaultHost = host;
-		if(port!=null)
-			HttpClientUtils.defaultPort = port;
-		// get publicKey from NIS
-		queryPublicKeyFromNIS(params);
+		DefaultSetting.setHostAndPort(params.get("host"), params.get("port"), null);
 		// send transaction
 		String publicKey = params.get("publicKey");
 		String privateKey = params.get("privateKey");
@@ -50,7 +45,7 @@ public class ImplInitTransaction {
 		String recipient = params.get("recipient");
 		String message = params.containsKey("message")?params.get("message"):"";
 		InitTransaction tx = new InitTransaction(publicKey, privateKey);
-		JSONObject result = JSONObject.fromObject(tx.send(recipient, amount, message));
+		JSONObject result = JSONObject.fromObject(tx.send_v2(recipient, amount, message));
 		if(result.containsKey("message") && "SUCCESS".equals(result.getString("message"))){
 			String transactionHash = result.getJSONObject("transactionHash").getString("data");
 			OutputMessage.initTransactionMessage("success", transactionHash);
@@ -68,7 +63,6 @@ public class ImplInitTransaction {
 		Map<String, String> params = new HashMap<String, String>();
 		CommandLineParser parser = new DefaultParser();
 		Options options = new Options();
-		options.addOption(Option.builder("address").hasArg().build());
 		options.addOption(Option.builder("privateKey").hasArg().build());
 		options.addOption(Option.builder("recipient").hasArg().build());
 		options.addOption(Option.builder("amount").hasArg().build());
@@ -88,18 +82,12 @@ public class ImplInitTransaction {
 			System.out.println(HelperUtils.printHelper(Constants.HELPER_FILE_INIT_TRANSACTION));
 			return null;
 		}
-		String address = commandLine.getOptionValue("address")==null?"":commandLine.getOptionValue("address").replaceAll("-", "");
 		String privateKey = commandLine.getOptionValue("privateKey")==null?"":commandLine.getOptionValue("privateKey");
 		String recipient = commandLine.getOptionValue("recipient")==null?"":commandLine.getOptionValue("recipient").replaceAll("-", "");
 		String amount = commandLine.getOptionValue("amount")==null?"":commandLine.getOptionValue("amount");
 		String message = commandLine.getOptionValue("message")==null?"":commandLine.getOptionValue("message");
 		String host = commandLine.getOptionValue("host");
 		String port = commandLine.getOptionValue("port");
-		// check address
-		if(address.length()!=40){
-			OutputMessage.error("invalid parameter [address]");
-			return null;
-		}
 		// check recipient
 		if(recipient.length()!=40){
 			OutputMessage.error("invalid parameter [recipient]");
@@ -125,7 +113,20 @@ public class ImplInitTransaction {
 			OutputMessage.error("invalid parameter [port]");
 			return null;
 		}
+		// get address
+		String address = KeyConvertor.getAddressFromPrivateKey(privateKey);
+		if(StringUtils.isEmpty(address)){
+			OutputMessage.error("unable to find address from private key");
+			return null;
+		}
+		// get public key
+		String publicKey = KeyConvertor.getPublicFromPrivateKey(privateKey);
+		if(StringUtils.isEmpty(publicKey)){
+			OutputMessage.error("unable to find public key from private key");
+			return null;
+		}
 		params.put("address", address);
+		params.put("publicKey", publicKey);
 		params.put("privateKey", privateKey);
 		params.put("recipient", recipient);
 		params.put("amount", amount);
@@ -135,15 +136,4 @@ public class ImplInitTransaction {
 		return params;
 	}
 	
-	/**
-	 * query public key from NIS
-	 * @param params
-	 */
-	private static void queryPublicKeyFromNIS(Map<String, String> params){
-		// query publicKey
-		String queryResult = HttpClientUtils.get(Constants.URL_ACCOUNT_GET + "?address=" + params.get("address"));
-		JSONObject queryAccount = JSONObject.fromObject(queryResult);
-		params.put("publicKey", queryAccount.getJSONObject("account").getString("publicKey"));
-	}
-
 }

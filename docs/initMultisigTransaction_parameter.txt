@@ -2,14 +2,13 @@ In parameters:
 --------------------------------------------------------------
 Name                     Description
 multisigAddress          the address of multisig account
-cosignatoryAddress       the address of cosignatory account
 cosignatoryPrivateKey    the private key of cosignatory account
 recipient                the address of the recipient
 amount                   the amount of NEM (xem)
 message                  the message included into the transaction
 host                     specify the server's host
 port                     specify the server's port
-Example: java -jar initMultisigTransaction.jar -multisigAddress xxx -cosignatoryAddress xxx -cosignatoryPrivateKey xxx -recipient xxx -amount 100 -message "I am test003" -host 127.0.0.1 -port 7890
+Example: java -jar initMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -recipient xxx -amount 100 -message "I am test003" -host 127.0.0.1 -port 7890
 
 Out parameters (JSON):
 --------------------------------------------------------------

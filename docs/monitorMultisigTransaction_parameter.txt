@@ -4,7 +4,8 @@ Name                    Description
 address                 the address of account
 host                    specify the server's host
 port                    specify the server's port
-Example: java -jar monitorMultisigTransaction.jar -address xxx -host 127.0.0.1 -port 7890
+wsPort                  specify the server's websocket port
+Example: java -jar monitorMultisigTransaction.jar -address xxx -host 127.0.0.1 -port 7890 -wsPort 7778
 
 Out parameters (JSON):
 --------------------------------------------------------------

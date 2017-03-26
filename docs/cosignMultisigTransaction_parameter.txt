@@ -2,12 +2,11 @@ In parameters:
 --------------------------------------------------------------
 Name                    Description
 multisigAddress         the address of multisig account
-cosignatoryAddress      the address of cosignatory account
 cosignatoryPrivateKey   the private key of cosignatory account
 innerTransactionHash    the hash of multisig transaction
 host                    specify the server's host
 port                    specify the server's port
-Example: java -jar cosignMultisigTransaction.jar -multisigAddress xxx -cosignatoryAddress xxx -cosignatoryPrivateKey xxx -innerTransactionHash xxx -host 127.0.0.1 -port 7890
+Example: java -jar cosignMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -innerTransactionHash xxx -host 127.0.0.1 -port 7890
 
 Out parameters (JSON):
 --------------------------------------------------------------

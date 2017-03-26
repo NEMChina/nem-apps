@@ -21,6 +21,7 @@ public class HttpClientUtils {
 	
 	public static String defaultHost = "127.0.0.1";
 	public static String defaultPort = "7895";
+	public static String defaultWsPort = "7778";
 
 	/**
 	 * Http Post

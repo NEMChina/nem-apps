@@ -8,11 +8,13 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang.StringUtils;
 
 import com.dfintech.nem.apps.model.CosignMultisigTransaction;
 import com.dfintech.nem.apps.utils.Constants;
+import com.dfintech.nem.apps.utils.DefaultSetting;
 import com.dfintech.nem.apps.utils.HelperUtils;
-import com.dfintech.nem.apps.utils.HttpClientUtils;
+import com.dfintech.nem.apps.utils.KeyConvertor;
 import com.dfintech.nem.apps.utils.OutputMessage;
 
 import net.sf.json.JSONObject;
@@ -25,6 +27,7 @@ import net.sf.json.JSONObject;
 public class ImplCosignMultisigTransaction {
 
 	public static void main(String[] args) {
+		DefaultSetting.setDefaultNetwork();
 		if(args.length==0){
 			OutputMessage.error("please enter parameter");
 			return;
@@ -33,22 +36,21 @@ public class ImplCosignMultisigTransaction {
 		if(params==null){
 			return;
 		}
-		String host = params.get("host");
-		String port = params.get("port");
 		// set host and port
-		if(host!=null)
-			HttpClientUtils.defaultHost = host;
-		if(port!=null)
-			HttpClientUtils.defaultPort = port;
-		// get publicKey from NIS
-		queryPublicKeyFromNIS(params);
+		DefaultSetting.setHostAndPort(params.get("host"), params.get("port"), null);
+		// get multisig public key
+		String multisigPublicKey = KeyConvertor.getPublicKeyFromAddress(params.get("multisigAddress"));
+		if(StringUtils.isEmpty(multisigPublicKey)){
+			OutputMessage.error("unable to find multisig public Key from multisig address");
+			return;
+		}
 		// send transaction
 		String innerTransactionHash = params.get("innerTransactionHash");
 		String cosignatoryPublicKey = params.get("cosignatoryPublicKey");
 		String cosignatoryPrivateKey = params.get("cosignatoryPrivateKey");
 		String multisigAddress = params.get("multisigAddress");
-		CosignMultisigTransaction tx = new CosignMultisigTransaction(cosignatoryPublicKey, cosignatoryPrivateKey, multisigAddress, innerTransactionHash);
-		JSONObject result = JSONObject.fromObject(tx.send());
+		CosignMultisigTransaction tx = new CosignMultisigTransaction(cosignatoryPublicKey, cosignatoryPrivateKey, multisigAddress, multisigPublicKey, innerTransactionHash);
+		JSONObject result = JSONObject.fromObject(tx.send_v2());
 		if(result.containsKey("message") && "SUCCESS".equals(result.getString("message"))){
 			String transactionHash = result.getJSONObject("transactionHash").getString("data");
 			OutputMessage.initCosignTransactionMessage("success", transactionHash);
@@ -67,7 +69,6 @@ public class ImplCosignMultisigTransaction {
 		CommandLineParser parser = new DefaultParser();
 		Options options = new Options();
 		options.addOption(Option.builder("multisigAddress").hasArg().build());
-		options.addOption(Option.builder("cosignatoryAddress").hasArg().build());
 		options.addOption(Option.builder("cosignatoryPrivateKey").hasArg().build());
 		options.addOption(Option.builder("innerTransactionHash").hasArg().build());
 		options.addOption(Option.builder("host").hasArg().build());
@@ -86,7 +87,6 @@ public class ImplCosignMultisigTransaction {
 			return null;
 		}
 		String multisigAddress = commandLine.getOptionValue("multisigAddress")==null?"":commandLine.getOptionValue("multisigAddress").replaceAll("-", "");
-		String cosignatoryAddress = commandLine.getOptionValue("cosignatoryAddress")==null?"":commandLine.getOptionValue("cosignatoryAddress").replaceAll("-", "");
 		String cosignatoryPrivateKey = commandLine.getOptionValue("cosignatoryPrivateKey")==null?"":commandLine.getOptionValue("cosignatoryPrivateKey");
 		String innerTransactionHash = commandLine.getOptionValue("innerTransactionHash")==null?"":commandLine.getOptionValue("innerTransactionHash");
 		String host = commandLine.getOptionValue("host");
@@ -94,11 +94,6 @@ public class ImplCosignMultisigTransaction {
 		// check multisigAddress
 		if(multisigAddress.length()!=40){
 			OutputMessage.error("invalid parameter [multisigAddress]");
-			return null;
-		}
-		// check cosignatoryAddress
-		if(cosignatoryAddress.length()!=40){
-			OutputMessage.error("invalid parameter [cosignatoryAddress]");
 			return null;
 		}
 		// check host
@@ -111,6 +106,12 @@ public class ImplCosignMultisigTransaction {
 			OutputMessage.error("invalid parameter [port]");
 			return null;
 		}
+		// get cosignatory address
+		String cosignatoryAddress = KeyConvertor.getAddressFromPrivateKey(cosignatoryPrivateKey);
+		if(StringUtils.isEmpty(cosignatoryAddress)){
+			OutputMessage.error("unable to find cosignatory address from private key");
+			return null;
+		}
 		params.put("multisigAddress", multisigAddress);
 		params.put("cosignatoryAddress", cosignatoryAddress);
 		params.put("cosignatoryPrivateKey", cosignatoryPrivateKey);
@@ -119,16 +120,4 @@ public class ImplCosignMultisigTransaction {
 		params.put("port", port);
 		return params;
 	}
-	
-	/**
-	 * query public key from NIS
-	 * @param params
-	 */
-	private static void queryPublicKeyFromNIS(Map<String, String> params){
-		// query cosignatory account publicKey
-		String queryResult = HttpClientUtils.get(Constants.URL_ACCOUNT_GET + "?address=" + params.get("cosignatoryAddress"));
-		JSONObject queryAccount = JSONObject.fromObject(queryResult);
-		params.put("cosignatoryPublicKey", queryAccount.getJSONObject("account").getString("publicKey"));
-	}
-
 }

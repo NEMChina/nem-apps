@@ -4,6 +4,24 @@
 	<groupId>nem-apps</groupId>
 	<artifactId>nem-apps</artifactId>
 	<version>0.0.1</version>
+	
+	<repositories>
+        <repository>
+            <id>repo2_maven_org</id>
+            <url>http://repo2.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>springsource-repo</id>
+            <name>SpringSource Repository</name>
+            <url>http://repo.springsource.org/release</url>
+        </repository>
+    </repositories>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>4.2.5.RELEASE</spring.version>
+    </properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -51,6 +69,56 @@
 		    <artifactId>commons-cli</artifactId>
 		    <version>1.3.1</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.nem.core</groupId>
+		    <artifactId>nem-core</artifactId>
+		    <version>0.6.84-BETA</version>
+		</dependency>
+		<dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.50</version>
+        </dependency>
+        <dependency>
+		    <groupId>javax.websocket</groupId>
+		    <artifactId>javax.websocket-client-api</artifactId>
+		    <version>1.1</version>
+		</dependency>
+		<dependency>
+		     <groupId>org.glassfish.tyrus.bundles</groupId>
+		     <artifactId>tyrus-standalone-client</artifactId>
+		     <version>1.9</version>
+		</dependency>
+		
+		<!-- spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        
+		<dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.5.3</version>
+        <scope>runtime</scope>
+    </dependency>
+		        
 	</dependencies>
 	<build>
 		<finalName>initTransaction</finalName>

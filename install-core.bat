@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=nem-core\nem-core-0.6.84-BETA.jar -DgroupId=org.nem.core -DartifactId=nem-core -Dversion=0.6.84-BETA -Dpackaging=jar
