@@ -10,7 +10,8 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.model.MultisigSignatureTransaction;
-import org.nem.core.model.TransactionFeeCalculatorAfterFork;
+import org.nem.core.model.TransactionFeeCalculatorAfterForkForApp;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.BinarySerializer;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
@@ -63,7 +64,7 @@ public class CosignMultisigTransaction {
 		return HttpClientUtils.post(Constants.URL_INIT_TRANSACTION, params.toString());
 	}
 	
-	public String send_v2(){
+	public String send_v2(String fee){
 		// collect parameters
 		TimeInstant timeInstant = new SystemTimeProvider().getCurrentTime();
 		KeyPair senderKeyPair = new KeyPair(PrivateKey.fromHexString(this.privateKey));
@@ -71,16 +72,20 @@ public class CosignMultisigTransaction {
 		Account multisigAccount = new Account(Address.fromPublicKey(PublicKey.fromHexString(this.multisigPublicKey)));
 		Hash otherTransactionHash = Hash.fromHexString(this.innerTransactionHash);
 		// create multisig signature transaction
-		MultisigSignatureTransaction MultisigSignatureTransaction = new MultisigSignatureTransaction(
+		MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				timeInstant, senderAccount, multisigAccount, otherTransactionHash);
-		TransactionFeeCalculatorAfterFork feeCalculator = new TransactionFeeCalculatorAfterFork();
-		MultisigSignatureTransaction.setFee(feeCalculator.calculateMinimumFee(MultisigSignatureTransaction));
-		MultisigSignatureTransaction.setDeadline(timeInstant.addHours(23));
-		MultisigSignatureTransaction.sign();
+		if(fee==null){
+			TransactionFeeCalculatorAfterForkForApp feeCalculator = new TransactionFeeCalculatorAfterForkForApp();
+			multisigSignatureTransaction.setFee(feeCalculator.calculateMinimumFee(multisigSignatureTransaction));
+		} else {
+			multisigSignatureTransaction.setFee(Amount.fromNem(0));
+		}
+		multisigSignatureTransaction.setDeadline(timeInstant.addHours(23));
+		multisigSignatureTransaction.sign();
 		JSONObject params = new JSONObject();
-		final byte[] data = BinarySerializer.serializeToBytes(MultisigSignatureTransaction.asNonVerifiable());
+		final byte[] data = BinarySerializer.serializeToBytes(multisigSignatureTransaction.asNonVerifiable());
 		params.put("data", ByteUtils.toHexString(data));
-		params.put("signature", MultisigSignatureTransaction.getSignature().toString());
+		params.put("signature", multisigSignatureTransaction.getSignature().toString());
 		return HttpClientUtils.post(Constants.URL_TRANSACTION_ANNOUNCE, params.toString());
 	}
 }

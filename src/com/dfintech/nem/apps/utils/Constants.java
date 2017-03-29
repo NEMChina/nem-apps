@@ -19,7 +19,9 @@ public class Constants {
 	public static final String URL_ACCOUNT_TRANSFERS_OUTGOING = "/account/transfers/outgoing";
 	public static final String URL_ACCOUNT_GET_FROMPUBLICKEY = "/account/get/from-public-key";
 	public static final String URL_ACCOUNT_UNCONFIRMEDTRANSACTIONS = "/account/unconfirmedTransactions";
+	public static final String URL_ACCOUNT_MOSAIC_OWNED = "/account/mosaic/owned";
 	public static final String URL_TRANSACTION_ANNOUNCE = "/transaction/announce";
+	public static final String URL_NAMESPACE_MOSAIC_DEFINITION_PAGE = "/namespace/mosaic/definition/page";
 	
 	public static final String URL_WS_W_MESSAGES = "/w/messages";
 	public static final String URL_WS_W_API_ACCOUNT_SUBSCRIBE = "/w/api/account/subscribe";

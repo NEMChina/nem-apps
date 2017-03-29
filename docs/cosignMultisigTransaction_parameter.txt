@@ -4,9 +4,10 @@ Name                    Description
 multisigAddress         the address of multisig account
 cosignatoryPrivateKey   the private key of cosignatory account
 innerTransactionHash    the hash of multisig transaction
-host                    specify the server's host
-port                    specify the server's port
-Example: java -jar cosignMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -innerTransactionHash xxx -host 127.0.0.1 -port 7890
+host                    specify the server's host (optional, default: 127.0.0.1)
+port                    specify the server's port (optional, default: 7890)
+ignoreFee               ignore the transaction fee (optional)
+Example: java -jar cosignMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -innerTransactionHash xxx -host 127.0.0.1 -port 7890 -ignoreFee
 
 Out parameters (JSON):
 --------------------------------------------------------------

@@ -4,10 +4,13 @@ Name              Description
 privateKey        the private key of the initiate
 recipient         the address of the recipient
 amount            the amount of NEM (xem)
-message           the message included into the transaction
-host              specify the server's host
-port              specify the server's port
-Example: java -jar initTransaction.jar -privateKey xxx -recipient xxx -amount 15 -message "I am tester002" -host 127.0.0.1 -port 7890
+message           the message included into the transaction (optional)
+mosaicName        the name of mosaic, <namespace>:<mosaic> (optional)
+mosaicQuantity    the quantity of mosaic (optional)
+host              specify the server's host (optional, default: 127.0.0.1)
+port              specify the server's port (optional, default: 7890)
+ignoreFee         ignore the transaction fee (optional)
+Example: java -jar initTransaction.jar -privateKey xxx -recipient xxx -amount 15 -message "I am tester002" -host 127.0.0.1 -port 7890 -mosaicName tester:xem -mosaicQuantity 10 -ignoreFee
 
 Out parameters (JSON):
 --------------------------------------------------------------

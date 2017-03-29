@@ -49,8 +49,9 @@ public class ImplCosignMultisigTransaction {
 		String cosignatoryPublicKey = params.get("cosignatoryPublicKey");
 		String cosignatoryPrivateKey = params.get("cosignatoryPrivateKey");
 		String multisigAddress = params.get("multisigAddress");
+		String fee = params.get("fee");
 		CosignMultisigTransaction tx = new CosignMultisigTransaction(cosignatoryPublicKey, cosignatoryPrivateKey, multisigAddress, multisigPublicKey, innerTransactionHash);
-		JSONObject result = JSONObject.fromObject(tx.send_v2());
+		JSONObject result = JSONObject.fromObject(tx.send_v2(fee));
 		if(result.containsKey("message") && "SUCCESS".equals(result.getString("message"))){
 			String transactionHash = result.getJSONObject("transactionHash").getString("data");
 			OutputMessage.initCosignTransactionMessage("success", transactionHash);
@@ -74,6 +75,7 @@ public class ImplCosignMultisigTransaction {
 		options.addOption(Option.builder("host").hasArg().build());
 		options.addOption(Option.builder("port").hasArg().build());
 		options.addOption(Option.builder("h").longOpt("help").build());
+		options.addOption(Option.builder("ignoreFee").build());
 		CommandLine commandLine = null;
 		try{
 			commandLine = parser.parse(options, args);
@@ -85,6 +87,10 @@ public class ImplCosignMultisigTransaction {
 		if(commandLine.hasOption("h")){
 			System.out.println(HelperUtils.printHelper(Constants.HELPER_FILE_COSIGN_MULTISIG_TRANSACTION));
 			return null;
+		}
+		// ignore fee
+		if(commandLine.hasOption("ignoreFee")){
+			params.put("fee", "0");
 		}
 		String multisigAddress = commandLine.getOptionValue("multisigAddress")==null?"":commandLine.getOptionValue("multisigAddress").replaceAll("-", "");
 		String cosignatoryPrivateKey = commandLine.getOptionValue("cosignatoryPrivateKey")==null?"":commandLine.getOptionValue("cosignatoryPrivateKey");

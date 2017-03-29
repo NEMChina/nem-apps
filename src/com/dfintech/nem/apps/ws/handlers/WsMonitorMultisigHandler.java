@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.nem.core.model.mosaic.MosaicFeeInformation;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Amount;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -22,6 +25,7 @@ import com.dfintech.nem.apps.utils.DateUtils;
 import com.dfintech.nem.apps.utils.HexStringUtils;
 import com.dfintech.nem.apps.utils.HttpClientUtils;
 import com.dfintech.nem.apps.utils.KeyConvertor;
+import com.dfintech.nem.apps.utils.NISQuery;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -108,7 +112,7 @@ public class WsMonitorMultisigHandler implements StompSessionHandler {
 				JSONObject unsignedAccountItem = new JSONObject();
 				unsignedAccountItem.put("address", unsignedAccount);
 				outUnsignedAccountArray.add(unsignedAccountItem);
-			}			
+			}
 			outJSON.put("status", "pending");
 			outJSON.put("innerTransactionHash", innerTransactionHash);
 			outJSON.put("cosignAccount", outCosignAccountArray);
@@ -122,6 +126,26 @@ public class WsMonitorMultisigHandler implements StompSessionHandler {
 				// if message type is 1, convert to String
 				if(message.getInt("type")==1 && HexStringUtils.hex2String(message.getString("payload"))!=null){
 					outJSON.put("message", HexStringUtils.hex2String(message.getString("payload")));
+				}
+			}
+			// mosaic
+			if(otherTrans.containsKey("mosaics")){
+				JSONArray outMosaicArray = new JSONArray();
+				JSONArray mosaics = otherTrans.getJSONArray("mosaics");
+				for(int j=0;j<mosaics.size();j++){
+					JSONObject outMosaic = new JSONObject();
+					JSONObject mosaic = mosaics.getJSONObject(j);
+					long quantity = mosaic.getLong("quantity");
+					String namespace = mosaic.getJSONObject("mosaicId").getString("namespaceId");
+					String mosaicName = mosaic.getJSONObject("mosaicId").getString("name");
+					MosaicId mosaicId = new MosaicId(new NamespaceId(namespace), mosaicName);
+					MosaicFeeInformation m = NISQuery.findMosaicFeeInformationByNIS(mosaicId);
+					outMosaic.put("name", mosaicId.toString());
+					outMosaic.put("quantity", quantity / Math.pow(10, m.getDivisibility()));
+					outMosaicArray.add(outMosaic);
+				}
+				if(outMosaicArray.size()!=0){
+					outJSON.put("mosaics", outMosaicArray);
 				}
 			}
 			outCosignedMap.put(innerTransactionHash, outJSON);
@@ -175,7 +199,7 @@ public class WsMonitorMultisigHandler implements StompSessionHandler {
 			JSONObject unsignedAccountItem = new JSONObject();
 			unsignedAccountItem.put("address", unsignedAccount);
 			outUnsignedAccountArray.add(unsignedAccountItem);
-		}			
+		}
 		outJSON.put("status", "pending");
 		outJSON.put("innerTransactionHash", innerTransactionHash);
 		outJSON.put("cosignAccount", outCosignAccountArray);
@@ -189,6 +213,26 @@ public class WsMonitorMultisigHandler implements StompSessionHandler {
 			// if message type is 1, convert to String
 			if(message.getInt("type")==1 && HexStringUtils.hex2String(message.getString("payload"))!=null){
 				outJSON.put("message", HexStringUtils.hex2String(message.getString("payload")));
+			}
+		}
+		// mosaic
+		if(otherTrans.containsKey("mosaics")){
+			JSONArray outMosaicArray = new JSONArray();
+			JSONArray mosaics = otherTrans.getJSONArray("mosaics");
+			for(int j=0;j<mosaics.size();j++){
+				JSONObject outMosaic = new JSONObject();
+				JSONObject mosaic = mosaics.getJSONObject(j);
+				long quantity = mosaic.getLong("quantity");
+				String namespace = mosaic.getJSONObject("mosaicId").getString("namespaceId");
+				String mosaicName = mosaic.getJSONObject("mosaicId").getString("name");
+				MosaicId mosaicId = new MosaicId(new NamespaceId(namespace), mosaicName);
+				MosaicFeeInformation m = NISQuery.findMosaicFeeInformationByNIS(mosaicId);
+				outMosaic.put("name", mosaicId.toString());
+				outMosaic.put("quantity", quantity / Math.pow(10, m.getDivisibility()));
+				outMosaicArray.add(outMosaic);
+			}
+			if(outMosaicArray.size()!=0){
+				outJSON.put("mosaics", outMosaicArray);
 			}
 		}
 		outCosignedMap.put(innerTransactionHash, outJSON);
@@ -318,6 +362,26 @@ public class WsMonitorMultisigHandler implements StompSessionHandler {
 				// if message type is 1, convert to String
 				if(message.getInt("type")==1 && HexStringUtils.hex2String(message.getString("payload"))!=null){
 					outJSON.put("message", HexStringUtils.hex2String(message.getString("payload")));
+				}
+			}
+			// mosaic
+			if(otherTrans.containsKey("mosaics")){
+				JSONArray outMosaicArray = new JSONArray();
+				JSONArray mosaics = otherTrans.getJSONArray("mosaics");
+				for(int j=0;j<mosaics.size();j++){
+					JSONObject outMosaic = new JSONObject();
+					JSONObject mosaic = mosaics.getJSONObject(j);
+					long quantity = mosaic.getLong("quantity");
+					String namespace = mosaic.getJSONObject("mosaicId").getString("namespaceId");
+					String mosaicName = mosaic.getJSONObject("mosaicId").getString("name");
+					MosaicId mosaicId = new MosaicId(new NamespaceId(namespace), mosaicName);
+					MosaicFeeInformation m = NISQuery.findMosaicFeeInformationByNIS(mosaicId);
+					outMosaic.put("name", mosaicId.toString());
+					outMosaic.put("quantity", quantity / Math.pow(10, m.getDivisibility()));
+					outMosaicArray.add(outMosaic);
+				}
+				if(outMosaicArray.size()!=0){
+					outJSON.put("mosaics", outMosaicArray);
 				}
 			}
 			outCosignedMap.remove(meta.getJSONObject("innerHash").getString("data"));

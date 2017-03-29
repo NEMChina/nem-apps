@@ -8,10 +8,12 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
-import org.nem.core.model.TransactionFeeCalculatorAfterFork;
+import org.nem.core.model.TransactionFeeCalculatorAfterForkForApp;
 import org.nem.core.model.TransferTransaction;
 import org.nem.core.model.TransferTransactionAttachment;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.BinarySerializer;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
@@ -63,18 +65,33 @@ public class InitTransaction {
 		return HttpClientUtils.post(Constants.URL_INIT_TRANSACTION, params.toString());
 	}
 	
-	public String send_v2(String recipient, long amount, String messagePayload){
+	public String send_v2(String recipient, long amount, String messagePayload, MosaicId mosaicId, Quantity mosaicQuantity, String fee){
 		// collect parameters
 		TimeInstant timeInstant = new SystemTimeProvider().getCurrentTime();
 		KeyPair senderKeyPair = new KeyPair(PrivateKey.fromHexString(this.privateKey));
 		Account senderAccount = new Account(senderKeyPair);
 		Account recipientAccount = new Account(Address.fromEncoded(recipient));
-		PlainMessage message = new PlainMessage(messagePayload.getBytes());
-		TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		// add message and mosaic
+		TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+		if(!"".equals(messagePayload.trim())){
+			PlainMessage message = new PlainMessage(messagePayload.getBytes());
+			attachment.setMessage(message);
+		}
+		if(mosaicId!=null && mosaicQuantity!=null){
+			attachment.addMosaic(mosaicId, mosaicQuantity);
+		}
+		if(attachment.getMessage()==null && attachment.getMosaics().size()==0){
+			attachment = null;
+		}
 		// create transaction
 		TransferTransaction transaction = new TransferTransaction(2, timeInstant, senderAccount, recipientAccount, Amount.fromNem(amount), attachment);
-		TransactionFeeCalculatorAfterFork feeCalculator = new TransactionFeeCalculatorAfterFork();
-		transaction.setFee(feeCalculator.calculateMinimumFee(transaction));
+		// ignore fee or not
+		if(fee==null){
+			TransactionFeeCalculatorAfterForkForApp feeCalculator = new TransactionFeeCalculatorAfterForkForApp();
+			transaction.setFee(feeCalculator.calculateMinimumFee(transaction));
+		} else {
+			transaction.setFee(Amount.fromNem(0));
+		}
 		transaction.setDeadline(timeInstant.addHours(23));
 		transaction.sign();
 		JSONObject params = new JSONObject();

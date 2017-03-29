@@ -5,10 +5,13 @@ multisigAddress          the address of multisig account
 cosignatoryPrivateKey    the private key of cosignatory account
 recipient                the address of the recipient
 amount                   the amount of NEM (xem)
-message                  the message included into the transaction
-host                     specify the server's host
-port                     specify the server's port
-Example: java -jar initMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -recipient xxx -amount 100 -message "I am test003" -host 127.0.0.1 -port 7890
+message                  the message included into the transaction (optional)
+mosaicName               the name of mosaic, <namespace>:<mosaic> (optional)
+mosaicQuantity           the quantity of mosaic (optional)
+host                     specify the server's host (optional, default: 127.0.0.1)
+port                     specify the server's port (optional, default: 7890)
+ignoreFee                ignore the transaction fee (optional)
+Example: java -jar initMultisigTransaction.jar -multisigAddress xxx -cosignatoryPrivateKey xxx -recipient xxx -amount 100 -message "I am test003" -mosaicName tester:xem -mosaicQuantity 10 -host 127.0.0.1 -port 7890 -ignoreFee
 
 Out parameters (JSON):
 --------------------------------------------------------------
