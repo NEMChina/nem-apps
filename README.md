@@ -3,7 +3,7 @@
 The project is built on the NEM blockchain and coded by Java, it's based on the NEM APIs. hoping that the project will give you some help if you're coding some NEM applications related to the NEM transactions as well. 
 
 ## What the project used for?
-The transaction is a important part of NEM network, you can initiate a transaction to transfer XEM or MOSAIC, and monitor the transactions of specific account by the programs.
+The transaction is an important part of NEM network, you can initiate a transaction to transfer XEM or MOSAIC, and monitor the transactions of specific account by the programs.
 
 The project is made up of five programs:
  * initiate a transfer transactoin (including mosaic)
